@@ -1,14 +1,4 @@
-logo = r"""
-.------.            _     _            _    _            _    
-|A_  _ |.          | |   | |          | |  (_)          | |   
-|( \/ ).-----.     | |__ | | __ _  ___| | ___  __ _  ___| | __
-| \  /|K /\  |     | '_ \| |/ _` |/ __| |/ / |/ _` |/ __| |/ /
-|  \/ | /  \ |     | |_) | | (_| | (__|   <| | (_| | (__|   < 
-`-----| \  / |     |_.__/|_|\__,_|\___|_|\_\ |\__,_|\___|_|\_\\
-      |  \/ K|                            _/ |                
-      `------'                           |__/           
-"""
-
+import art
 import random
 
 
@@ -59,10 +49,12 @@ while True:
         print("Thanks for playing! 👋")
         break
 
-    print(logo)
+    print(art.logo)
 
     user_cards = []
     computer_cards = []
+    user_score = -1
+    computer_score = -1
 
     for _ in range(2):
         user_cards.append(deal_card())
@@ -78,7 +70,7 @@ while True:
         print(f"Computer's first card: {computer_cards[0]}")
 
         # Auto stop if blackjack or bust
-        if user_score == 0 or user_score > 21:
+        if user_score == 0 or user_score > 21 or computer_score == 0 :
             game_over = True
         else:
             choice = input("Type 'y' to draw another card or 'n' to stand: ").lower()
