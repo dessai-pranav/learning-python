@@ -1,4 +1,3 @@
-import art
 import random
 
 
