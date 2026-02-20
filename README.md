@@ -1,6 +1,6 @@
-# 🐍 100 Days of Python – Learning Challenge
+# 🐍 Python – Learning Challenge
 
-Welcome to my **100 Days of Python** challenge repository! 🚀  
+Welcome to my **Python** learning challenge repository! 🚀  
 
 This repository documents my journey of learning Python consistently for 100 days.  
 The goal of this challenge is to build strong programming fundamentals, improve problem-solving skills, and develop real-world projects using Python.
