@@ -1,0 +1,6 @@
+2026/04/09-18:48:32.460 2c2e6 Reusing MANIFEST /home/pranavdessaii/PycharmProjects/PythonProject18/day49/chrome_profile/Default/IndexedDB/https_appbrewery.github.io_0.indexeddb.leveldb/MANIFEST-000001
+2026/04/09-18:48:32.460 2c2e6 Recovering log #3
+2026/04/09-18:48:32.460 2c2e6 Reusing old log /home/pranavdessaii/PycharmProjects/PythonProject18/day49/chrome_profile/Default/IndexedDB/https_appbrewery.github.io_0.indexeddb.leveldb/000003.log 
+2026/04/09-18:48:32.864 2c2e8 Level-0 table #5: started
+2026/04/09-18:48:32.873 2c2e8 Level-0 table #5: 854840 bytes OK
+2026/04/09-18:48:32.874 2c2e8 Delete type=0 #3
