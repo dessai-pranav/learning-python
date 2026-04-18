@@ -13,13 +13,17 @@ PROMISED_UP = 10
 service = Service("/usr/bin/chromedriver")
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_experimental_option("detach", True)
-
+TWITTER_MAIL = os.environ.get("TWITTER_MAIL")
+PASS = os.environ.get("TWITTER_PASS")
 
 class InternetSpeedTwitterBot:
     def __init__(self):
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         self.down = 0
         self.up = 0
+        self.email = TWITTER_MAIL
+        self.password = PASS
+
 
     def get_internet_speed(self):
         self.driver.get("https://www.speedtest.net/")
@@ -46,10 +50,22 @@ class InternetSpeedTwitterBot:
         self.driver.get("https://x.com/i/flow/login")
         time.sleep(3)
 
-        go_button = self.driver.find_element(By.CSS_SELECTOR, value=".start-button a")
-        go_button.click()
+        email = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.TAG_NAME, "input"))
+        )
+        email.send_keys(self.email)
 
-        time.sleep(30)
+        next_button = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "/html/body/div/div/div/div/div[1]/div/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/button[2]/div/div/span/span"))
+        )
+        next_button.click()
+        password = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.TAG_NAME, "div"))
+        )
+        password.send_keys(self.password)
+        submit_button = self.driver.find_element(By.ID, value="submit-button")
+        submit_button.click()
+
 
 
 speed = InternetSpeedTwitterBot()
