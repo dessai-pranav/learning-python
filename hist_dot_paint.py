@@ -1,6 +1,6 @@
 # import colorgram
 # rgb_colors  = []
-# colors = colorgram.extract('images.jpg', 30)
+# colors = colorgram.extract('static.jpg', 30)
 # for color in colors:
 #     r = color.rgb.r
 #     g = color.rgb.g
