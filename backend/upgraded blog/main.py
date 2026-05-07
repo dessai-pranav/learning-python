@@ -1,6 +1,10 @@
-from flask import Flask, render_template
+from flask import Flask, render_template,request
 import requests
+import smtplib
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 app = Flask(__name__)
 
 response = requests.get("https://api.npoint.io/c790b4d5cab58020d391")
@@ -15,11 +19,41 @@ def home():
 @app.route("/about")
 def about():
     return render_template("about.html")
-
-
-@app.route("/contact")
+@app.route("/contact", methods=["POST","GET"])
 def contact():
-    return render_template("contact.html")
+    if request.method == "POST":
+        user = os.getenv("EMAIL_USER")
+        password = os.getenv("EMAIL_PASS")
+        data = request.form
+        print(data["name"])
+        print(data["email"])
+        print(data["phone"])
+        print(data["message"])
+        with smtplib.SMTP("smtp.gmail.com",587) as smtp:
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.login(user,password)
+            message = f"""Subject: New Blog Contact Message
+
+            Name: {data['name']}
+            Email: {data['email']}
+            Phone: {data['phone']}
+
+            Message:
+            {data['message']}
+            """
+
+            smtp.sendmail(
+                user,
+                user,
+                message
+            )
+            return render_template("contact.html",msg_sent=True)
+    return render_template("contact.html",msg_sent=False)
+
+
+
+
 
 
 @app.route("/post/<int:index>")
