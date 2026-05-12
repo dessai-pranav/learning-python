@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 from flask_wtf import FlaskForm
-from wtforms import PasswordField
-from wtforms.validators import DataRequired
+from wtforms import PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email
 from wtforms.fields import StringField
 import secrets
 app = Flask(__name__)
@@ -9,7 +9,8 @@ app.config['SECRET_KEY'] = secrets.token_hex(16)
 
 class MyForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
-    password = StringField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 @app.route("/")
 def home():

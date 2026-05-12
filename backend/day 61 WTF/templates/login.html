@@ -7,11 +7,13 @@
 	<body>
         <div class="container">
 		<h1>Login</h1>
-        <form method ="POST" action="/login">
+        <form method ="POST" action="{{ url_for('login') }}">
 			{{form.csrf_token}}
-			{{form.name.label}} {{form.name(size=20)}}
-			{{form.password.label}} {{form.password(Size=20)}}
-			<input type="submit" value = "G0">
+			<p>{{form.name.label}} <br>{{form.name(size=20)}}</p>
+			<p>{{form.password.label}} <br>{{form.password(Size=20)}}</p>
+			{{form.submit}}
+
+
 		</form>
         </div>
 	</body>
