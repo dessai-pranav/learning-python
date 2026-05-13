@@ -8,8 +8,15 @@
     />
 
     {% block styles %}
+
     <!-- Load Bootstrap-Flask CSS here -->
 {{ bootstrap.load_css() }}
+    <style>
+      body{
+      background-color: #333;
+      color: white;
+      }
+    </style>
     <!-- Link to the styles.css here to apply styling to all the child templates.-->
 
     {% endblock %}
