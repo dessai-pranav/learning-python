@@ -86,6 +86,12 @@ def edit(movie_id):
         return redirect(url_for("home"))
     return render_template("edit.html",form=form)
 
+@app.route("/delete/<int:movie_id>")
+def delete(movie_id):
+    movie_delete = db.get_or_404(Movie,movie_id)
+    db.session.delete(movie_delete)
+    db.session.commit()
+    return redirect(url_for("home"))
 
 
 
