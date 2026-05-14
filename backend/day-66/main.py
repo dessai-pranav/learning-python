@@ -127,7 +127,7 @@ def add_cafe():
         has_toilet=bool(request.form.get("toilets")),
         has_wifi=bool(request.form.get("wifi")),
         can_take_calls=bool(request.form.get("calls")),
-        seats=request.form.get("seats"),
+        seat=request.form.get("seat"),
         coffee_price=request.form.get("coffee_price")
     )
     db.session.add(new_cafe)
@@ -137,8 +137,59 @@ def add_cafe():
 # HTTP POST - Create Record
 
 # HTTP PUT/PATCH - Update Record
+@app.route("/update/<int:cafe_id>",methods=["PATCH"])
+def update_cafe(cafe_id):
+    cafe = db.session.execute(db.select(Cafe).where(Cafe.id == cafe_id))
+    if cafe:
+        new_price =request.form.get("new_price")
+        cafe.coffee_price = new_price
+        db.session.commit()
+        return jsonify(response = {"success":"successfully updated the cafe"})
+    else:
+        return jsonify(
+            {
+                "error": {
+                    "not found":"sorry"
+                }
+            }
+        )
 
 # HTTP DELETE - Delete Record
+
+@app.route("/delete/<int:cafe_id>", methods=["DELETE"])
+def delete_cafe(cafe_id):
+
+    api_key = request.args.get("api-key")
+
+    if api_key == "TopSecretAPIKey":
+
+        cafe = db.session.execute(
+            db.select(Cafe).where(Cafe.id == cafe_id)
+        ).scalar()
+
+        if cafe:
+            db.session.delete(cafe)
+            db.session.commit()
+
+            return jsonify(
+                response={
+                    "success": "Successfully deleted the cafe"
+                }
+            ), 200
+
+        else:
+            return jsonify(
+                error={
+                    "Not Found": "Sorry, cafe was not found"
+                }
+            ), 404
+
+    else:
+        return jsonify(
+            error={
+                "Forbidden": "Not authorized to do this"
+            }
+        ), 403
 
 
 if __name__ == '__main__':
