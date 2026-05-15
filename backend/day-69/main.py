@@ -10,7 +10,7 @@ from sqlalchemy import Integer, String, Text, ForeignKey
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from forms import  RegisterForm,LoginForm
+from forms import  RegisterForm,LoginForm,CommentForm
 from forms import CreatePostForm
 
 
@@ -31,31 +31,69 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
-
 # CONFIGURE TABLES
 class BlogPost(db.Model):
     __tablename__ = "blog_posts"
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    author_id: Mapped[int] = mapped_column(Integer, ForeignKey("register_users.id"))
+
+    author_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("register_users.id")
+    )
+
     title: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
     subtitle: Mapped[str] = mapped_column(String(250), nullable=False)
     date: Mapped[str] = mapped_column(String(250), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
-    author = relationship("RegisterUser", back_populates="posts")
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
+    # relationship with RegisterUser
+    author = relationship("RegisterUser", back_populates="posts")
 
-# TODO: Create a User table for all your registered users.
+    # relationship with Comment
+    comments = relationship("Comment", back_populates="parent_post")
+
+
+# USER TABLE
 class RegisterUser(UserMixin, db.Model):
     __tablename__ = "register_users"
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(250), nullable=False)
     email: Mapped[str] = mapped_column(String(250), nullable=False)
     password: Mapped[str] = mapped_column(String(250), nullable=False)
+
+    # one user -> many blog posts
     posts = relationship("BlogPost", back_populates="author")
 
+    # one user -> many comments
+    comments = relationship("Comment", back_populates="author")
 
 
+# COMMENT TABLE
+class Comment(db.Model):
+    __tablename__ = "comments"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+
+    author_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("register_users.id")
+    )
+
+    post_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("blog_posts.id")
+    )
+
+    # comment -> user
+    author = relationship("RegisterUser", back_populates="comments")
+
+    # comment -> blog post
+    parent_post = relationship("BlogPost", back_populates="comments")
 with app.app_context():
     db.create_all()
 
@@ -134,7 +172,20 @@ def get_all_posts():
 @app.route("/post/<int:post_id>")
 def show_post(post_id):
     requested_post = db.get_or_404(BlogPost, post_id)
-    return render_template("post.html", post=requested_post)
+    comment_form = CommentForm()
+    if comment_form.validate_on_submit():
+        if not current_user.is_authenticated:
+            flash('Login Unsuccessful. Please check email and password', 'danger',)
+            return redirect(url_for('login'))
+        new_comment = Comment(
+            text = comment_form.comment.data,
+            author_id = current_user.id,
+            parent_post_id = requested_post.id,
+        )
+        db.session.add(new_comment)
+        db.session.commit()
+
+    return render_template("post.html", post=requested_post,current_user=current_user,comment_form=comment_form)
 
 
 # TODO: Use a decorator so only an admin user can create a new post
