@@ -41,7 +41,8 @@ def home():
 @app.route('/register',methods=['GET','POST'])
 def register():
     if request.method == 'POST':
-        new_user = User(email=request.form.get('email'), password=request.form.get('password'), name=request.form.get('name'))
+        hashed_password = generate_password_hash(request.form['password'], method='pbkdf2:sha256', salt_length=8)
+        new_user = User(email=request.form.get('email'),password = hashed_password , name=request.form.get('name'))
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('secrets'))
@@ -65,9 +66,11 @@ def logout():
     pass
 
 
-@app.route('/download')
-def download():
-    pass
+@app.route('/download/<path:name>')
+def download(name):
+    return send_from_directory("static/files", name)
+
+
 
 
 if __name__ == "__main__":
