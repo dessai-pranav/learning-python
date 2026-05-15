@@ -22,7 +22,7 @@ db.init_app(app)
 # CREATE TABLE IN DB
 
 
-class User(db.Model):
+class User(db.Model,UserMixin):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     email: Mapped[str] = mapped_column(String(100), unique=True)
     password: Mapped[str] = mapped_column(String(100))
@@ -32,6 +32,13 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 @app.route('/')
 def home():
@@ -45,25 +52,43 @@ def register():
         new_user = User(email=request.form.get('email'),password = hashed_password , name=request.form.get('name'))
         db.session.add(new_user)
         db.session.commit()
+        login_user(new_user)
         return redirect(url_for('secrets'))
     return render_template("register.html")
 
 
 
-@app.route('/login')
+@app.route('/login',methods=['GET','POST'])
 def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user = db.session.execute(db.select(User).where(User.email == email)).scalar_one_or_none()
+        if not user:
+            flash('Email or Password is incorrect.')
+            return redirect(url_for('login'))
+        elif not check_password_hash(user.password, password):
+            flash('Incorrect Password')
+            return redirect(url_for('login'))
+        else:
+            login_user(user)
+            return redirect(url_for('secrets'))
     return render_template("login.html")
 
 
 @app.route('/secrets')
+@login_required
 def secrets():
     users = db.session.execute(db.select(User)).scalars().all()
     return render_template("secrets.html", users=users)
 
 
 @app.route('/logout')
+@login_required
 def logout():
-    pass
+    logout_user()
+    return redirect(url_for('home'))
+
 
 
 @app.route('/download/<path:name>')
