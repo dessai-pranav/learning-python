@@ -54,7 +54,7 @@ def register():
         db.session.commit()
         login_user(new_user)
         return redirect(url_for('secrets'))
-    return render_template("register.html")
+    return render_template("register.html",logged_in = current_user.is_authenticated)
 
 
 
